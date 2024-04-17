@@ -272,7 +272,7 @@ class CarController():
         self.model = CarModel()
         self.view = CarView(args)
 
-        self.chk_IncludeAccel=qtw.QCheckBox()
+        #self.chk_IncludeAccel=qtw.QCheckBox()
 
     def ode_system(self, X, t):
         # define the forcing function equation for the linear ramp
