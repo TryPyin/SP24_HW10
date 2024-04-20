@@ -126,9 +126,9 @@ class CarModel():
         #set default values for the properties of the quarter car model
         self.m1 = 450 # mass of car body in kg
         self.m2 = #$JES MISSING CODE#  # mass of wheel in kg
-        self.c1 = #$JES MISSING CODE#  # damping coefficient in N*s/m
-        self.k1 = #$JES MISSING CODE#  # spring constant of suspension in N/m
-        self.k2 = #$JES MISSING CODE#  # spring constant of tire in N/m
+        self.c1 = 1.0  # damping coefficient in N*s/m
+        self.k1 = 1000.0  # spring constant of suspension in N/m
+        self.k2 = 4000.0  # spring constant of tire in N/m
         self.v = #$JES MISSING CODE#  # velocity of car in kph
 
 
