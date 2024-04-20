@@ -124,7 +124,7 @@ class CarModel():
         self.results = None
 
         #set default values for the properties of the quarter car model
-        self.m1 = #$JES MISSING CODE# # mass of car body in kg
+        self.m1 = 450 # mass of car body in kg
         self.m2 = #$JES MISSING CODE#  # mass of wheel in kg
         self.c1 = #$JES MISSING CODE#  # damping coefficient in N*s/m
         self.k1 = #$JES MISSING CODE#  # spring constant of suspension in N/m
@@ -132,10 +132,10 @@ class CarModel():
         self.v = #$JES MISSING CODE#  # velocity of car in kph
 
 
-        self.mink1 = #$JES MISSING CODE#  #If I jack up my car and release the load on the spring, it extends about 3 inches
-        self.maxk1 = #$JES MISSING CODE#  #What would be a good value for a soft spring vs. a stiff spring?
-        self.mink2 = #$JES MISSING CODE#  #Same question for the shock absorber.
-        self.maxk2 = #$JES MISSING CODE#
+        self.mink1 = 735.75  #If I jack up my car and release the load on the spring, it extends about 3 inches
+        self.maxk1 = 1471.5  #What would be a good value for a soft spring vs. a stiff spring?
+        self.mink2 = 2943.0  #Same question for the shock absorber.
+        self.maxk2 = 5886.0
         self.accel =None
         self.accelMax = #$JES MISSING CODE#
         self.accelLim = #$JES MISSING CODE#
