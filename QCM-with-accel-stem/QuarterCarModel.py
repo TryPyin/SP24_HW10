@@ -283,14 +283,15 @@ class CarController():
         else:
             y = self.model.ymag
 
-        x1 = #$JES MISSING CODE#  # car position in vertical direction
-        x1dot = #$JES MISSING CODE#  # car velocity  in vertical direction
-        x2 = #$JES MISSING CODE#  # wheel position in vertical direction
-        x2dot = #$JES MISSING CODE#  # wheel velocity in vertical direction
+        x1 = X[0]  # car position in vertical direction
+        x1dot = X[1]  # car velocity in vertical direction
+        x2 = X[2]  # wheel position in vertical direction
+        x2dot = X[3]  # wheel velocity in vertical direction
 
         # write the non-trivial equations in vertical direction
-        x1ddot = #$JES MISSING CODE#)
-        x2ddot = #$JES MISSING CODE#
+        x1ddot = (self.model.k2 * (x2 - x1) + self.model.c1 * (x2dot - x1dot)) / self.model.m1
+        x2ddot = (-self.model.k2 * (x2 - x1) - self.model.c1 * (x2dot - x1dot) - self.model.k1 * (
+                    x2 - y)) / self.model.m2
 
         # return the derivatives of the input state vector
         return [x1dot, x1ddot, x2dot, x2ddot]
@@ -301,18 +302,18 @@ class CarController():
         in another function doCalc.
         """
         #Step 1.  Read from the widgets
-        self.model.m1 = #$JES MISSING CODE#
-        self.model.m2 = #$JES MISSING CODE#
-        self.model.c1 = #$JES MISSING CODE#
-        self.model.k1 = #$JES MISSING CODE#
-        self.model.k2 = #$JES MISSING CODE#
-        self.model.v = #$JES MISSING CODE#
+        self.model.m1 = float(self.le_m1.text())
+        self.model.m2 = float(self.le_m2.text())
+        self.model.c1 = float(self.le_c1.text())
+        self.model.k1 = float(self.le_k1.text())
+        self.model.k2 = float(self.le_k2.text())
+        self.model.v = float(self.le_v.text())
 
         #recalculate min and max k values
-        self.mink1=#$JES MISSING CODE#
-        self.maxk1=#$JES MISSING CODE#
-        self.mink2=#$JES MISSING CODE#
-        self.maxk2=#$JES MISSING CODE#
+        self.mink1 = 750.0  # min value for car suspension spring constant
+        self.maxk1 = 1500.0  # max value for car suspension spring constant
+        self.mink2 = 3000.0  # min value for tire spring constant
+        self.maxk2 = 6000.0  # max value for tire spring constant
 
         ymag=6.0/(12.0*3.3)   #This is the height of the ramp in m
         if ymag is not None:
@@ -379,10 +380,10 @@ class CarController():
         self.calculate(doCalc=False)
         #Step 2:
         #JES MISSING CODE HERE$
-        x0= # create a numpy array with initial values for k1, c1, and k2
+        x0 = [self.model.k1, self.model.c1, self.model.k2]  # Initial values for k1, c1, and k2
         #Step 3:
         #JES MISSING CODE HERE$
-        answer= #use the Nelder-Mead method to minimize the SSE function (our objective function)
+        answer = minimize(self.SSE, x0, method='Nelder-Mead', options={'adaptive': True})
         self.view.updateView(self.model)
 
     def SSE(self, vals, optimizing=True):
