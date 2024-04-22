@@ -125,20 +125,20 @@ class CarModel():
 
         #set default values for the properties of the quarter car model
         self.m1 = 450 # mass of car body in kg
-        self.m2 = 45  # mass of wheel in kg
-        self.c1 = 1.0  # damping coefficient in N*s/m
-        self.k1 = 1000.0  # spring constant of suspension in N/m
-        self.k2 = 4000.0  # spring constant of tire in N/m
-        self.v = 30  # velocity of car in kph
+        self.m2 = 20  # mass of wheel in kg
+        self.c1 = 4500.0  # damping coefficient in N*s/m
+        self.k1 = 15000.0  # spring constant of suspension in N/m
+        self.k2 = 90000.0  # spring constant of tire in N/m
+        self.v = 120  # velocity of car in kph
 
 
-        self.mink1 = 735.75  #If I jack up my car and release the load on the spring, it extends about 3 inches
-        self.maxk1 = 1471.5  #What would be a good value for a soft spring vs. a stiff spring?
-        self.mink2 = 2943.0  #Same question for the shock absorber.
-        self.maxk2 = 5886.0
-        self.accel =None
-        self.accelMax = 0.0
-        self.accelLim = 25
+        self.mink1 = 672.7698 #If I jack up my car and release the load on the spring, it extends about 3 inches
+        self.maxk1 = 336.7698 #What would be a good value for a soft spring vs. a stiff spring?
+        self.mink2 = 3.73761 #Same question for the shock absorber.
+        self.maxk2 = 7.47522
+        self.accel = None
+        self.accelMax = 2.5
+        self.accelLim = 2.2
         self.SSE = 0.0
 
 class CarView():
@@ -310,10 +310,10 @@ class CarController():
         self.model.v = float(self.le_v.text())
 
         #recalculate min and max k values
-        self.mink1 = 750.0  # min value for car suspension spring constant
-        self.maxk1 = 1500.0  # max value for car suspension spring constant
-        self.mink2 = 3000.0  # min value for tire spring constant
-        self.maxk2 = 6000.0  # max value for tire spring constant
+        self.mink1 = (self.m1 * 9.81) / ((6 * 25.4) / 1000) # min value for car suspension spring constant
+        self.maxk1 = (self.m1 * 9.81) / ((3 * 25.4) / 1000) # max value for car suspension spring constant
+        self.mink2 = (self.m2 * 9.81) / ((1.5 * 25.4)/1000) # min value for tire spring constant
+        self.maxk2 = (self.m2 * 9.81) / ((0.75 * 25.4)/1000)  # max value for tire spring constant
 
         ymag=6.0/(12.0*3.3)   #This is the height of the ramp in m
         if ymag is not None:
@@ -376,14 +376,17 @@ class CarController():
         :return:
         """
         #Step 1:
-        #$JES MISSING CODE HERE$
+        self.set(doCalc=False)#!!!
         self.calculate(doCalc=False)
-        #Step 2:
-        #JES MISSING CODE HERE$
-        x0 = [self.model.k1, self.model.c1, self.model.k2]  # Initial values for k1, c1, and k2
+        #Step 2: Make an initial guess for k1, c1, k2
+        inital_guess_k1 = 1000 #!!!
+        initial_guess_c1 = 50 #!!
+        initial_guess_k2 = 5000 #!!
+        x0 = [inital_guess_k1, initial_guess_c1, initial_guess_k2]  # Initial values for k1, c1, and k2
         #Step 3:
-        #JES MISSING CODE HERE$
+        minimize(self.SSE, x0, method='Nelder - Mead')
         answer = minimize(self.SSE, x0, method='Nelder-Mead', options={'adaptive': True})
+        self.model.k1, self.model.c1, self.model.k2 = answer.x
         self.view.updateView(self.model)
 
     def SSE(self, vals, optimizing=True):
