@@ -6,6 +6,7 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from QuarterCarModel import CarController
 
+# This code was written by Dr.Smay but edited with help of ChatGPT by Austin Armendariz and Ethan Huynh
 #these imports are necessary for drawing a matplot lib graph on my GUI
 #no simple widget for this exists in QT Designer, so I have to add the widget in code.
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
@@ -13,6 +14,9 @@ from matplotlib.figure import Figure
 #endregion
 
 class MainWindow(qtw.QWidget, Ui_Form):
+    """
+       Main window class for the Quarter Car Model application, inheriting from QWidget and the generated UI class.
+    """
     def __init__(self):
         """
         Main window constructor.
@@ -40,6 +44,10 @@ class MainWindow(qtw.QWidget, Ui_Form):
         self.show()
 
     def doOptimize(self):
+        """
+        Method to perform optimization of the suspension system. This sets a wait cursor, calls the optimization,
+        and then restores the default cursor.
+        """
         app.setOverrideCursor(qtc.Qt.WaitCursor)
         self.controller.OptimizeSuspension()
         app.restoreOverrideCursor()
