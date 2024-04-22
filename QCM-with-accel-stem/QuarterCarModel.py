@@ -17,7 +17,24 @@ from matplotlib.figure import Figure
 #region class definitions
 #region specialized graphic items
 class MassBlock(qtw.QGraphicsItem):
+    """
+       A custom QGraphicsItem to represent a mass block (like a car body) in the simulation.
+    """
     def __init__(self, CenterX, CenterY, width=30, height=10, parent=None, pen=None, brush=None, name='CarBody', mass=10):
+        """
+        Initializes a MassBlock object with a specified center, dimensions, appearance, and physical properties.
+
+        Args:
+            CenterX (float): X-coordinate of the center.
+            CenterY (float): Y-coordinate of the center.
+            width (int, optional): Width of the block. Defaults to 30.
+            height (int, optional): Height of the block. Defaults to 10.
+            parent (Optional[qtw.QGraphicsItem], optional): Parent item. Defaults to None.
+            pen (Optional[qtg.QPen], optional): Pen used for drawing. Defaults to None.
+            brush (Optional[qtg.QBrush], optional): Brush used for filling. Defaults to None.
+            name (str, optional): Name of the block. Defaults to 'CarBody'.
+            mass (float, optional): Mass of the block. Defaults to 10.
+        """
         super().__init__(parent)
         self.x = CenterX
         self.y = CenterY
@@ -35,10 +52,21 @@ class MassBlock(qtw.QGraphicsItem):
         self.setToolTip(stTT)
 
     def boundingRect(self):
+        """
+        Defines the outer bounds of the item as required by QGraphicsItem.
+        """
         bounding_rect = self.transformation.mapRect(self.rect)
         return bounding_rect
 
     def paint(self, painter, option, widget=None):
+        """
+         Paints the content of the item using the provided painter object.
+
+         Args:
+            painter (qtg.QPainter): The painter object.
+            option (QStyleOptionGraphicsItem): Provides style options for the item.
+            widget (Optional[QWidget], optional): The widget onto which the item is painted. Defaults to None.
+        """
         self.transformation.reset()
         if self.pen is not None:
             painter.setPen(self.pen)  # Red color pen
@@ -58,7 +86,24 @@ class MassBlock(qtw.QGraphicsItem):
         # painter.drawRect(self.boundingRect())
 
 class Wheel(qtw.QGraphicsItem):
+    """
+        A custom QGraphicsItem to represent a wheel in the simulation.
+    """
     def __init__(self, CenterX, CenterY, radius=10, parent=None, pen=None, wheelBrush=None, massBrush=None, name='Wheel', mass=10):
+        """
+               Initializes a Wheel object with specific properties and appearance.
+
+               Args:
+                   CenterX (float): X-coordinate of the center.
+                   CenterY (float): Y-coordinate of the center.
+                   radius (int, optional): Radius of the wheel. Defaults to 10.
+                   parent (Optional[qtw.QGraphicsItem], optional): Parent item. Defaults to None.
+                   pen (Optional[qtg.QPen], optional): Pen used for the outline. Defaults to None.
+                   wheelBrush (Optional[qtg.QBrush], optional): Brush used for the wheel. Defaults to None.
+                   massBrush (Optional[qtg.QBrush], optional): Brush used for the mass block. Defaults to None.
+                   name (str, optional): Name of the wheel. Defaults to 'Wheel'.
+                   mass (float, optional): Mass of the wheel. Defaults to 10.
+        """
         super().__init__(parent)
         self.x = CenterX
         self.y = CenterY
@@ -74,13 +119,30 @@ class Wheel(qtw.QGraphicsItem):
         self.massBlock = MassBlock(CenterX, CenterY, width=2*radius*0.85, height=radius/3, pen=pen, brush=massBrush, name="Wheel Mass", mass=mass)
 
     def boundingRect(self):
+        """
+        Defines the outer bounds of the item as required by QGraphicsItem.
+        """
         bounding_rect = self.transformation.mapRect(self.rect)
         return bounding_rect
     def addToScene(self, scene):
+        """
+               Adds the wheel and its associated mass block to the given scene.
+
+               Args:
+                   scene (qtw.QGraphicsScene): The scene to which the items will be added.
+        """
         scene.addItem(self)
         scene.addItem(self.massBlock)
 
     def paint(self, painter, option, widget=None):
+        """
+        Paints the content of the item using the provided painter object.
+
+        Args:
+            painter (qtg.QPainter): The painter object.
+             option (QStyleOptionGraphicsItem): Provides style options for the item.
+             widget (Optional[QWidget], optional): The widget onto which the item is painted. Defaults to None.
+        """
         self.transformation.reset()
         if self.pen is not None:
             painter.setPen(self.pen)  # Red color pen
@@ -126,23 +188,32 @@ class CarModel():
         #set default values for the properties of the quarter car model
         self.m1 = 450 # mass of car body in kg
         self.m2 = 20  # mass of wheel in kg
-        self.c1 = 4500.0  # damping coefficient in N*s/m
-        self.k1 = 15000.0  # spring constant of suspension in N/m
-        self.k2 = 90000.0  # spring constant of tire in N/m
-        self.v = 120  # velocity of car in kph
+        self.c1 = 1.0  # damping coefficient in N*s/m
+        self.k1 = 1000.0  # spring constant of suspension in N/m
+        self.k2 = 4000.0  # spring constant of tire in N/m
+        self.v = 30  # velocity of car in kph
 
 
-        self.mink1 = 672.7698 #If I jack up my car and release the load on the spring, it extends about 3 inches
-        self.maxk1 = 336.7698 #What would be a good value for a soft spring vs. a stiff spring?
-        self.mink2 = 3.73761 #Same question for the shock absorber.
-        self.maxk2 = 7.47522
-        self.accel = None
-        self.accelMax = 2.5
-        self.accelLim = 2.2
+        self.mink1 = 735.75  #If I jack up my car and release the load on the spring, it extends about 3 inches
+        self.maxk1 = 1471.5  #What would be a good value for a soft spring vs. a stiff spring?
+        self.mink2 = 2943.0  #Same question for the shock absorber.
+        self.maxk2 = 5886.0
+        self.accel =None
+        self.accelMax = 0.0
+        self.accelLim = 25
         self.SSE = 0.0
 
 class CarView():
+    """
+        Represents the view part of the MVC pattern, responsible for the user interface and visual output of the simulation.
+    """
     def __init__(self, args):
+        """
+                Initializes the CarView with references to input and display widgets.
+
+                Args:
+                    args (tuple): Tuple containing lists of input and display widgets.
+        """
         self.input_widgets, self.display_widgets = args
         # unpack widgets with same names as they have on the GUI
         self.le_m1, self.le_v, self.le_k1, self.le_c1, self.le_m2, self.le_k2, self.le_ang, \
@@ -164,6 +235,12 @@ class CarView():
         self.buildScene()
 
     def updateView(self, model=None):
+        """
+                Updates the UI elements based on the current state of the model.
+
+                Args:
+                    model (CarModel, optional): The model containing the current state. Defaults to None.
+        """
         self.le_m1.setText("{:0.2f}".format(model.m1))
         self.le_k1.setText("{:0.2f}".format(model.k1))
         self.le_c1.setText("{:0.2f}".format(model.c1))
@@ -177,6 +254,9 @@ class CarView():
         self.doPlot(model)
 
     def buildScene(self):
+        """
+                Constructs the graphical scene with visual representations of the car model components.
+        """
         #create a scene object
         self.scene = qtw.QGraphicsScene()
         self.scene.setObjectName("MyScene")
@@ -193,12 +273,21 @@ class CarView():
         ##$JES MISSING CODE# #Finish building the scene to look similar to the schematic on the problem assignment
 
     def setupPensAndBrushes(self):
+        """
+                Configures the pens and brushes used for drawing in the scene.
+        """
         self.penWheel = qtg.QPen(qtg.QColor("orange"))
         self.penWheel.setWidth(1)
         self.brushWheel = qtg.QBrush(qtg.QColor.fromHsv(35,255,255, 64))
         self.brushMass = qtg.QBrush(qtg.QColor(200,200,200, 128))
 
     def doPlot(self, model=None):
+        """
+                Updates the plot area with new data from the model.
+
+                Args:
+                    model (CarModel, optional): The model containing the new data to plot. Defaults to None.
+        """
         if model.results is None:
             return
         ax = self.ax
@@ -257,6 +346,9 @@ class CarView():
             self.canvas.draw()
 
 class CarController():
+    """
+       Represents the controller part of the MVC pattern, handling the logic and interactions between the model and the view.
+    """
     def __init__(self, args):
         """
         This is the controller I am using for the quarter car model.
@@ -275,6 +367,16 @@ class CarController():
         #self.chk_IncludeAccel=qtw.QCheckBox()
 
     def ode_system(self, X, t):
+        """
+                Defines the system of ordinary differential equations (ODEs) for the quarter car model.
+
+                Args:
+                    X (list): Current state vector of the system.
+                    t (float): Current time.
+
+                Returns:
+                    list: Derivatives of the state vector at time t.
+        """
         # define the forcing function equation for the linear ramp
         # It takes self.tramp time to climb the ramp, so y position is
         # a linear function of time.
@@ -310,10 +412,10 @@ class CarController():
         self.model.v = float(self.le_v.text())
 
         #recalculate min and max k values
-        self.mink1 = (self.m1 * 9.81) / ((6 * 25.4) / 1000) # min value for car suspension spring constant
-        self.maxk1 = (self.m1 * 9.81) / ((3 * 25.4) / 1000) # max value for car suspension spring constant
-        self.mink2 = (self.m2 * 9.81) / ((1.5 * 25.4)/1000) # min value for tire spring constant
-        self.maxk2 = (self.m2 * 9.81) / ((0.75 * 25.4)/1000)  # max value for tire spring constant
+        self.mink1 = 750.0  # min value for car suspension spring constant
+        self.maxk1 = 1500.0  # max value for car suspension spring constant
+        self.mink2 = 3000.0  # min value for tire spring constant
+        self.maxk2 = 6000.0  # max value for tire spring constant
 
         ymag=6.0/(12.0*3.3)   #This is the height of the ramp in m
         if ymag is not None:
@@ -351,7 +453,11 @@ class CarController():
 
     def calcAccel(self):
         """
-        Calculate the acceleration in the vertical direction using the forward difference formula.
+                Performs the actual calculations by solving the ODEs and updating the model state.
+
+                Args:
+                    doPlot (bool, optional): Specifies whether to update the plot after calculations. Defaults to True.
+                    doAccel (bool, optional): Specifies whether to calculate accelerations. Defaults to True.
         """
         N=len(self.model.t)
         self.model.accel=np.zeros(shape=N)
@@ -376,25 +482,26 @@ class CarController():
         :return:
         """
         #Step 1:
-        self.set(doCalc=False)#!!!
+        #$JES MISSING CODE HERE$
         self.calculate(doCalc=False)
-        #Step 2: Make an initial guess for k1, c1, k2
-        inital_guess_k1 = 1000 #!!!
-        initial_guess_c1 = 50 #!!
-        initial_guess_k2 = 5000 #!!
-        x0 = [inital_guess_k1, initial_guess_c1, initial_guess_k2]  # Initial values for k1, c1, and k2
+        #Step 2:
+        #JES MISSING CODE HERE$
+        x0 = [self.model.k1, self.model.c1, self.model.k2]  # Initial values for k1, c1, and k2
         #Step 3:
-        minimize(self.SSE, x0, method='Nelder - Mead')
+        #JES MISSING CODE HERE$
         answer = minimize(self.SSE, x0, method='Nelder-Mead', options={'adaptive': True})
-        self.model.k1, self.model.c1, self.model.k2 = answer.x
         self.view.updateView(self.model)
 
     def SSE(self, vals, optimizing=True):
         """
-        Calculates the sum of square errors between the contour of the road and the car body.
-        :param vals:
-        :param optimizing:
-        :return:
+        Computes the sum of squared errors (SSE) for the car model.
+
+        Args:
+            vals (list): Current values for the spring constants and damping coefficient.
+            optimizing (bool, optional): Indicates if the function is called during optimization. Defaults to True.
+
+        Returns:
+            float: Computed SSE value.
         """
         k1, c1, k2=vals  #unpack the new values for k1, c1, k2
         self.model.k1=k1
@@ -433,6 +540,9 @@ class CarController():
 #endregion
 
 def main():
+    """
+       Main function to create and run the car controller.
+    """
     QCM = CarController()
     QCM.doCalc()
 
